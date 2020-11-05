@@ -1,0 +1,45 @@
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "user_name": "ion@marin.com",
+  "password": "12345678"
+}
+
+###
+
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+"user_name": "ion@ion.com",
+"password": "12345678"
+}
+
+###
+
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "user_name": "ion@mihai.com",
+  "password": "12345678"
+}
+
+###
+
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "user_name": "ion@ghe.com",
+  "password": "12345678"
+}
+
+###
+
+GET http://localhost:8080/login
+Accept: application/json
+Authorization: Basic aW9uQGlvbi5jb206MTIzNDU2Nzg=
+
+###

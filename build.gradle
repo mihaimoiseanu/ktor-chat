@@ -1,0 +1,63 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id "org.flywaydb.flyway" version "5.2.4"
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+group 'com.coders.chat'
+version '0.0.1'
+mainClassName = "io.ktor.server.netty.EngineMain"
+
+sourceSets {
+    main.kotlin.srcDirs = main.java.srcDirs = ['src']
+    test.kotlin.srcDirs = test.java.srcDirs = ['test']
+    main.resources.srcDirs = ['resources']
+    test.resources.srcDirs = ['testresources']
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven { url 'https://kotlin.bintray.com/ktor' }
+    maven { url 'https://kotlin.bintray.com/kotlinx' }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-jackson:$ktor_version"
+    implementation "ch.qos.logback:logback-classic:$logback_version"
+
+    implementation "org.koin:koin-ktor:2.1.0"
+
+    //Auth
+    implementation "io.ktor:ktor-auth:$ktor_version"
+    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
+    implementation "org.mindrot:jbcrypt:0.4"
+
+    implementation 'com.zaxxer:HikariCP:3.4.5'
+    implementation 'org.jetbrains.exposed:exposed:0.17.7'
+
+    implementation 'org.flywaydb:flyway-core:7.0.4'
+    runtime 'mysql:mysql-connector-java:8.0.22'
+}
+
+flyway {
+    url = System.getenv('DB_URL')
+    user = System.getenv('DB_USER')
+    password = System.getenv('DB_PASSWORD')
+    baselineOnMigrate = true
+    locations = ["filesystem:resources/db/migration"]
+}
