@@ -3,9 +3,8 @@ package com.coders.chat.auth
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.impl.PublicClaims
 import com.auth0.jwt.interfaces.Payload
-import com.coders.chat.user.model.UserModel
+import com.coders.chat.user.UserModel
 import org.koin.dsl.module
 import org.mindrot.jbcrypt.BCrypt
 import java.util.*

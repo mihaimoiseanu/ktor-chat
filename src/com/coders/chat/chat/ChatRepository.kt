@@ -1,8 +1,5 @@
-package com.coders.chat.chat.repository
+package com.coders.chat.chat
 
-import com.coders.chat.chat.Chat
-import com.coders.chat.chat.persistence.Chats
-import com.coders.chat.chat.persistence.ChatsUsers
 import com.coders.chat.dbQuery
 import io.ktor.features.*
 import org.jetbrains.exposed.sql.ResultRow
@@ -14,16 +11,16 @@ import java.util.*
 val chatRepositoryModule = module { single<ChatRepository> { ChatRepositoryImpl() } }
 
 interface ChatRepository {
-    suspend fun getChat(id: UUID): Chat
+    suspend fun getChat(id: UUID): ChatModel
     suspend fun createChat(): UUID
     suspend fun addUserToChat(chatId: UUID, userId: UUID)
     suspend fun getChatUsers(chatId: UUID): List<UUID>
     suspend fun getUsersChat(userId: UUID): List<UUID>
-    suspend fun getChatsById(chatsUserIds: List<UUID>): List<Chat>
+    suspend fun getChatsById(chatsUserIds: List<UUID>): List<ChatModel>
 }
 
 private class ChatRepositoryImpl : ChatRepository {
-    override suspend fun getChat(id: UUID): Chat {
+    override suspend fun getChat(id: UUID): ChatModel {
         return dbQuery {
             Chats
                 .select { Chats.id eq id }
@@ -67,7 +64,7 @@ private class ChatRepositoryImpl : ChatRepository {
         }
     }
 
-    override suspend fun getChatsById(chatsUserIds: List<UUID>): List<Chat> {
+    override suspend fun getChatsById(chatsUserIds: List<UUID>): List<ChatModel> {
         return dbQuery {
             Chats
                 .select { Chats.id inList chatsUserIds }
@@ -75,7 +72,7 @@ private class ChatRepositoryImpl : ChatRepository {
         }
     }
 
-    private fun ResultRow.toChat(): Chat = Chat(
+    private fun ResultRow.toChat(): ChatModel = ChatModel(
         this[Chats.id],
         this[Chats.creationTime]
     )

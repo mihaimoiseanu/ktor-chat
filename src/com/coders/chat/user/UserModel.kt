@@ -1,4 +1,4 @@
-package com.coders.chat.user.model
+package com.coders.chat.user
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.ktor.auth.*

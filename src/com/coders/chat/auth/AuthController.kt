@@ -1,15 +1,18 @@
 package com.coders.chat.auth
 
-import com.coders.chat.user.model.UserModel
-import com.coders.chat.user.service.UserService
+import com.coders.chat.user.UserModel
+import com.coders.chat.user.UsersService
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.koin.dsl.module
+
+val authModule = module { single { AuthController(get(), get()) } } + authRepoModule + authServiceModule
 
 class AuthController(
-    private val userService: UserService,
+    private val usersService: UsersService,
     private val authService: AuthService
 ) {
     fun addRoutes(route: Route) {
@@ -34,7 +37,7 @@ class AuthController(
     private fun addRegisterRoute(route: Route) {
         route.post("/register") {
             val user = call.receive<UserModel>()
-            userService.saveUser(user)
+            usersService.saveUser(user)
             call.respond(HttpStatusCode.Created)
         }
     }

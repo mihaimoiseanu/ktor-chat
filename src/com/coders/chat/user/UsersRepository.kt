@@ -1,17 +1,14 @@
-package com.coders.chat.user.repository
+package com.coders.chat.user
 
 import com.coders.chat.dbQuery
-import com.coders.chat.user.model.UserModel
-import com.coders.chat.user.persistence.Users
-import com.coders.chat.user.persistence.UsersDetails
 import io.ktor.features.*
 import org.jetbrains.exposed.sql.*
 import org.koin.dsl.module
 import java.util.*
 
-val userRepoModule = module { single<UserRepository> { UserRepositoryImpl() } }
+val userRepoModule = module { single<UsersRepository> { UsersRepositoryImpl() } }
 
-interface UserRepository {
+interface UsersRepository {
     suspend fun getUsers(): List<UserModel>
     suspend fun getUserById(userId: UUID): UserModel
     suspend fun saveUser(userToSave: UserModel)
@@ -19,7 +16,7 @@ interface UserRepository {
     suspend fun updateUser(userId: UUID, user: UserModel)
 }
 
-private class UserRepositoryImpl : UserRepository {
+private class UsersRepositoryImpl : UsersRepository {
 
     override suspend fun getUsers(): List<UserModel> {
         return dbQuery {

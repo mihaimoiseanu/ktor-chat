@@ -74,7 +74,7 @@ fun Application.module(testing: Boolean = false) {
         authController.addRoutes(this)
         authenticate {
             usersController.addRoutes(this)
-            chatController.addRoute(this)
+            chatController.addChatRoutes(this)
         }
     }
 }

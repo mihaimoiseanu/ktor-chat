@@ -1,8 +1,8 @@
 package com.coders.chat.auth
 
 import com.coders.chat.dbQuery
-import com.coders.chat.user.model.UserModel
-import com.coders.chat.user.persistence.Users
+import com.coders.chat.user.UserModel
+import com.coders.chat.user.Users
 import org.jetbrains.exposed.sql.select
 import org.koin.dsl.module
 

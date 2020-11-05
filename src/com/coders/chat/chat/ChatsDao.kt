@@ -1,7 +1,7 @@
-package com.coders.chat.chat.persistence
+package com.coders.chat.chat
 
-import com.coders.chat.message.Messages
-import com.coders.chat.user.persistence.Users
+import com.coders.chat.message.MessagesDao
+import com.coders.chat.user.Users
 import org.jetbrains.exposed.sql.Table
 
 internal object Chats : Table() {
@@ -16,5 +16,5 @@ internal object ChatsUsers : Table() {
 
 internal object ChatsMessages : Table() {
     val chatId = reference("chat_id", Chats.id).primaryKey()
-    val chatMessage = reference("chat_message", Messages.id).primaryKey()
+    val chatMessage = reference("chat_message", MessagesDao.id).primaryKey()
 }

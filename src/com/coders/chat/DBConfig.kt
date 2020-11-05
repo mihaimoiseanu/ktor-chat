@@ -1,11 +1,11 @@
 package com.coders.chat
 
-import com.coders.chat.chat.persistence.Chats
-import com.coders.chat.chat.persistence.ChatsMessages
-import com.coders.chat.chat.persistence.ChatsUsers
-import com.coders.chat.message.Messages
-import com.coders.chat.user.persistence.Users
-import com.coders.chat.user.persistence.UsersDetails
+import com.coders.chat.chat.Chats
+import com.coders.chat.chat.ChatsMessages
+import com.coders.chat.chat.ChatsUsers
+import com.coders.chat.message.MessagesDao
+import com.coders.chat.user.Users
+import com.coders.chat.user.UsersDetails
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
@@ -25,7 +25,7 @@ internal fun initDb() {
     config.schema = "chat-ktor"
     val dataSource = HikariDataSource(config)
     Database.connect(dataSource)
-    val tables = arrayOf(Users, UsersDetails, Messages, Chats, ChatsMessages, ChatsUsers)
+    val tables = arrayOf(Users, UsersDetails, MessagesDao, Chats, ChatsMessages, ChatsUsers)
     transaction {
 //        SchemaUtils.drop(*tables, inBatch = true)
         SchemaUtils.create(*tables)

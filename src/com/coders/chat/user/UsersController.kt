@@ -1,16 +1,17 @@
 package com.coders.chat.user
 
-import com.coders.chat.user.model.UserModel
-import com.coders.chat.user.service.UserService
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.koin.dsl.module
 import java.util.*
 
-class UsersController(private val userService: UserService) {
+val userModule = module { single { UsersController(get()) } } + userServiceModule + userRepoModule
+
+class UsersController(private val usersService: UsersService) {
 
     fun addRoutes(route: Route) {
         addPrincipalRoute(route)
@@ -31,7 +32,7 @@ class UsersController(private val userService: UserService) {
 
     private fun addGetUsersRoute(route: Route) {
         route.get("/users") {
-            val users = userService.getUsers()
+            val users = usersService.getUsers()
             call.respond(users)
         }
     }
@@ -42,7 +43,7 @@ class UsersController(private val userService: UserService) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@get
             }
-            val user = userService.getUserById(UUID.fromString(userId)) ?: run {
+            val user = usersService.getUserById(UUID.fromString(userId)) ?: run {
                 call.respond(HttpStatusCode.NotFound, "User not found")
                 return@get
             }
@@ -57,7 +58,7 @@ class UsersController(private val userService: UserService) {
                 call.respond(HttpStatusCode.Forbidden)
                 return@put
             }
-            val updatedUser = userService.updateUser(user, principalId)
+            val updatedUser = usersService.updateUser(user, principalId)
             call.respond(updatedUser)
         }
     }
