@@ -1,5 +1,6 @@
 package com.coders.chat.chat
 
+import io.ktor.features.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -13,6 +14,8 @@ interface ChatService {
     suspend fun getChatById(chatId: UUID): ChatModel
     suspend fun getChatsForUser(userId: UUID): List<ChatModel>
     suspend fun checkIfUserIsInChat(chatId: UUID, principalId: UUID)
+    suspend fun getChatForUsers(usersId: List<UUID>): ChatModel
+    suspend fun getChatUsers(chatId: UUID): List<UUID>
 }
 
 private class ChatServiceImpl(
@@ -24,10 +27,13 @@ private class ChatServiceImpl(
         if (users.size < 2) {
             throw IllegalStateException("Can't create a chat with no user")
         }
-        val chatId = chatRepository.createChat()
-        users.map { userId ->
-            async { chatRepository.addUserToChat(chatId, userId) }
-        }.awaitAll()
+        var chatId = chatRepository.getChatIdForUsers(users.toList())
+        if (chatId == null) {
+            chatId = chatRepository.createChat()
+            users.map { userId ->
+                async { chatRepository.addUserToChat(chatId, userId) }
+            }.awaitAll()
+        }
         getChatById(chatId)
     }
 
@@ -38,7 +44,7 @@ private class ChatServiceImpl(
     }
 
     override suspend fun getChatsForUser(userId: UUID): List<ChatModel> = coroutineScope {
-        val chatsUserIds = chatRepository.getUsersChat(userId)
+        val chatsUserIds = chatRepository.getUserChats(userId)
         chatRepository.getChatsById(chatsUserIds).map { chat ->
             async {
                 val chatUsers = chatRepository.getChatUsers(chat.id!!)
@@ -47,9 +53,18 @@ private class ChatServiceImpl(
         }.awaitAll()
     }
 
+    override suspend fun getChatForUsers(usersId: List<UUID>): ChatModel {
+        val chatId = chatRepository.getChatIdForUsers(usersId) ?: throw NotFoundException("Chat not found")
+        return getChatById(chatId)
+    }
+
     override suspend fun checkIfUserIsInChat(chatId: UUID, principalId: UUID) {
         val chatUsers = chatRepository.getChatUsers(chatId)
         if (chatUsers.contains(principalId)) return
         throw IllegalStateException("User not in chat")
+    }
+
+    override suspend fun getChatUsers(chatId: UUID): List<UUID> {
+        return chatRepository.getChatUsers(chatId)
     }
 }

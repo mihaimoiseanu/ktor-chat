@@ -15,8 +15,9 @@ interface ChatRepository {
     suspend fun createChat(): UUID
     suspend fun addUserToChat(chatId: UUID, userId: UUID)
     suspend fun getChatUsers(chatId: UUID): List<UUID>
-    suspend fun getUsersChat(userId: UUID): List<UUID>
+    suspend fun getUserChats(userId: UUID): List<UUID>
     suspend fun getChatsById(chatsUserIds: List<UUID>): List<ChatModel>
+    suspend fun getChatIdForUsers(usersIds: List<UUID>): UUID?
 }
 
 private class ChatRepositoryImpl : ChatRepository {
@@ -49,6 +50,23 @@ private class ChatRepositoryImpl : ChatRepository {
         }
     }
 
+    override suspend fun getChatIdForUsers(usersIds: List<UUID>): UUID? {
+        return dbQuery {
+            ChatsUsers
+                .select { ChatsUsers.userId inList usersIds }
+                .groupBy { it[ChatsUsers.chatId] }
+                .map { it.key }
+
+        }.firstOrNull { checkResultIfMatchUsers(it, usersIds) }
+    }
+
+    private suspend fun checkResultIfMatchUsers(chatId: UUID, usersIds: List<UUID>): Boolean {
+        val usersInChat = getChatUsers(chatId).toHashSet()
+        if (usersInChat.size != usersIds.size) return false
+        val usersIdsSet = usersIds.toHashSet()
+        return usersInChat.containsAll(usersIds) && usersIdsSet.containsAll(usersInChat)
+    }
+
     override suspend fun getChatUsers(chatId: UUID): List<UUID> {
         return dbQuery {
             ChatsUsers.select { ChatsUsers.chatId eq chatId }
@@ -56,7 +74,7 @@ private class ChatRepositoryImpl : ChatRepository {
         }
     }
 
-    override suspend fun getUsersChat(userId: UUID): List<UUID> {
+    override suspend fun getUserChats(userId: UUID): List<UUID> {
         return dbQuery {
             ChatsUsers
                 .select { ChatsUsers.userId eq userId }

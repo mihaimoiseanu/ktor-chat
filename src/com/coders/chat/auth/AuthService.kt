@@ -24,7 +24,7 @@ val authServiceModule = module {
 interface AuthService {
     val realm: String
     suspend fun checkCredentialsAndGetToken(credentials: String): String?
-    fun makeJwtVerifier(): JWTVerifier
+    val jwtVerifier: JWTVerifier
     suspend fun verifyPayloadAndReturnUser(payload: Payload): UserModel
 }
 
@@ -33,7 +33,7 @@ private class AuthServiceImpl(
     private val jwtProperties: JwtProperties
 ) : AuthService {
 
-    private val algorithm = Algorithm.HMAC256("secret")
+    private val algorithm = Algorithm.HMAC256("my_awesome_secret")
     override val realm: String
         get() = jwtProperties.realm
 
@@ -63,7 +63,7 @@ private class AuthServiceImpl(
 
     private fun getExpiration() = Date(System.currentTimeMillis() + jwtProperties.validityInMs)
 
-    override fun makeJwtVerifier(): JWTVerifier =
+    override val jwtVerifier: JWTVerifier =
         JWT.require(algorithm)
             .withAudience(jwtProperties.audience)
             .withIssuer(jwtProperties.domain)

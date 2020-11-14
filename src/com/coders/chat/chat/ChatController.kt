@@ -24,6 +24,7 @@ class ChatController(
             addGetUserChatsRoute()
             addCreateChatRoute()
             addGetMessagesRoute()
+            addGetChatForUsers()
         }
     }
 
@@ -55,6 +56,17 @@ class ChatController(
             val principalUserId = call.principal<UserModel>()?.id ?: return@post
             val createdChat = chatService.createChat(chat, principalUserId)
             call.respond(HttpStatusCode.Created, createdChat)
+        }
+    }
+
+    private fun Route.addGetChatForUsers() {
+        get("/chat/for") {
+            val users = call.receive<List<String>>().map { UUID.fromString(it) }.toMutableSet().also {
+                val principalUserId = call.principal<UserModel>()?.id!!
+                it.add(principalUserId)
+            }.toList()
+            val chatId = chatService.getChatForUsers(users)
+            call.respond(chatId)
         }
     }
 
